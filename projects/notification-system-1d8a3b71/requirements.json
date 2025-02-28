@@ -1,0 +1,67 @@
+{
+  "name": "Notification System",
+  "description": "A system for managing and delivering notifications to users",
+  "functional_requirements": [
+    {
+      "id": "FR-1",
+      "name": "Notification Creation",
+      "description": "System should allow creating notifications with different priorities"
+    },
+    {
+      "id": "FR-2",
+      "name": "Notification Delivery",
+      "description": "System should support multiple delivery channels (email, SMS, in-app)"
+    },
+    {
+      "id": "FR-3",
+      "name": "Notification Templates",
+      "description": "System should support customizable notification templates"
+    },
+    {
+      "id": "FR-4",
+      "name": "Delivery Status Tracking",
+      "description": "System should track and report delivery status of notifications"
+    }
+  ],
+  "non_functional_requirements": [
+    {
+      "id": "NFR-1",
+      "name": "Performance",
+      "description": "System should handle at least 1000 notifications per minute"
+    },
+    {
+      "id": "NFR-2",
+      "name": "Reliability",
+      "description": "System should have 99.9% uptime"
+    },
+    {
+      "id": "NFR-3",
+      "name": "Security",
+      "description": "All notification data should be encrypted at rest and in transit"
+    }
+  ],
+  "constraints": [
+    {
+      "id": "CON-1",
+      "name": "Compliance",
+      "description": "System must comply with data protection regulations"
+    },
+    {
+      "id": "CON-2",
+      "name": "Integration",
+      "description": "System must integrate with existing user management system"
+    }
+  ],
+  "stakeholders": [
+    {
+      "id": "SH-1",
+      "name": "End Users",
+      "needs": "Receive timely and relevant notifications"
+    },
+    {
+      "id": "SH-2",
+      "name": "Administrators",
+      "needs": "Manage notification settings and monitor delivery"
+    }
+  ]
+}

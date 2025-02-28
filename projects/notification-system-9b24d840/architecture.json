@@ -1,0 +1,34 @@
+{
+  "name": "System Architecture",
+  "description": "Detailed architecture",
+  "components": [
+    {
+      "name": "User Service",
+      "description": "Handles user-related operations. Built with Node.js and communicates with other services via RESTful APIs."
+    },
+    {
+      "name": "Product Service",
+      "description": "Manages product-related operations. Built with Python and communicates with other services via RESTful APIs."
+    },
+    {
+      "name": "Order Service",
+      "description": "Manages order-related operations. Built with Java and communicates with other services via RESTful APIs."
+    },
+    {
+      "name": "Database",
+      "description": "Stores data for all services. Implemented with PostgreSQL."
+    },
+    {
+      "name": "Security",
+      "description": "Implements JWT for authentication and authorization. All services will validate tokens before processing requests."
+    },
+    {
+      "name": "Error Handling",
+      "description": "Each service has its own error handling mechanism, logging errors to a centralized log service."
+    },
+    {
+      "name": "DevOps",
+      "description": "Uses Docker for containerization, Kubernetes for orchestration, Jenkins for CI/CD, and Prometheus and Grafana for monitoring."
+    }
+  ]
+}

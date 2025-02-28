@@ -1,0 +1,44 @@
+# Core dependencies
+python-dotenv>=1.0.0
+pydantic>=2.4.0
+loguru>=0.7.0
+fastapi>=0.103.1
+uvicorn>=0.23.2
+
+# AI and LLM integration
+openai>=1.3.0
+langchain>=0.0.300
+
+# Security
+pyjwt>=2.7.0
+cryptography>=41.0.0
+passlib>=1.7.4
+python-jose>=3.3.0
+bcrypt>=4.0.1
+bandit>=1.7.5
+safety>=2.3.5
+
+# Authentication and authorization
+fastapi-users>=12.1.0
+httpx>=0.24.1
+
+# Testing
+pytest>=7.4.0
+pytest-cov>=4.1.0
+pytest-mock>=3.11.1
+pytest-security>=0.1.1
+
+# Code quality and security
+ruff>=0.0.290
+mypy>=1.5.1
+semgrep>=1.37.0
+detect-secrets>=1.4.0
+
+# API security
+uvicorn[standard]>=0.23.2  # For HTTPS support
+python-multipart>=0.0.6  # For form parsing
+fastapi-limiter>=0.1.5  # For rate limiting
+
+# Documentation
+mkdocs>=1.5.3
+mkdocs-material>=9.4.2

@@ -1,0 +1,71 @@
+---
+# Development Environment Deployment Configuration
+environment: dev
+version: 1.0.0
+deployment_id: dev-aidevos-001
+
+# Deployment Strategy
+strategy: blue-green
+timeout_seconds: 300
+rollback_on_failure: true
+
+# Resources
+resources:
+  cpu_limit: 2
+  memory_limit: "2Gi"
+  storage_limit: "10Gi"
+
+# Services
+services:
+  - name: user-service
+    image: aidevos/user-service:latest
+    replicas: 2
+    health_check:
+      path: /health
+      port: 8080
+      initial_delay_seconds: 10
+      period_seconds: 30
+      timeout_seconds: 5
+      failure_threshold: 3
+    
+  - name: data-service
+    image: aidevos/data-service:latest
+    replicas: 2
+    health_check:
+      path: /health
+      port: 8081
+      initial_delay_seconds: 10
+      period_seconds: 30
+      timeout_seconds: 5
+      failure_threshold: 3
+
+# Durable Objects
+durable_objects:
+  config_path: /Users/speed/aidevos/config/durable_objects.json
+  registry_url: https://registry.aidevos.dev
+  auth_token_env: AIDEVOS_REGISTRY_TOKEN
+
+# Networking
+networking:
+  domain: dev.aidevos.io
+  use_tls: true
+  ingress:
+    annotations:
+      kubernetes.io/ingress.class: nginx
+  
+# Monitoring
+monitoring:
+  enable_metrics: true
+  prometheus_endpoint: /metrics
+  logging:
+    level: debug
+    retention_days: 7
+
+# Notifications
+notifications:
+  slack_webhook_env: SLACK_WEBHOOK_URL
+  email:
+    enabled: true
+    recipients:
+      - devops@aidevos.io
+      - alerts@aidevos.io

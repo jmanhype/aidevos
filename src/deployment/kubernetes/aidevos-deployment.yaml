@@ -1,0 +1,634 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: aidevos-system
+---
+# Configuration maps for environment-specific settings
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: aidevos-config
+  namespace: aidevos-system
+data:
+  LOG_LEVEL: "info"
+  AIDEVOS_ENV: "${ENVIRONMENT}"
+  AIDEVOS_API_PORT: "8000"
+  AIDEVOS_REGISTRY_URL: "http://registry-service:8001"
+  AIDEVOS_EVENT_BUS_URL: "http://event-bus-service:8002"
+---
+# Secret for sensitive configuration
+apiVersion: v1
+kind: Secret
+metadata:
+  name: aidevos-secrets
+  namespace: aidevos-system
+type: Opaque
+data:
+  # These values should be Base64 encoded and ideally managed through a secrets manager
+  AIDEVOS_DB_URI: "${DB_URI_BASE64}"
+  AIDEVOS_REDIS_URI: "${REDIS_URI_BASE64}"
+  AIDEVOS_API_KEY: "${API_KEY_BASE64}"
+  AIDEVOS_REGISTRY_TOKEN: "${REGISTRY_TOKEN_BASE64}"
+---
+# Service Account
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: aidevos-service-account
+  namespace: aidevos-system
+---
+# Orchestration Layer Components
+---
+# Service Registry Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: registry-deployment
+  namespace: aidevos-system
+  labels:
+    app: aidevos
+    component: registry
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: aidevos
+      component: registry
+  template:
+    metadata:
+      labels:
+        app: aidevos
+        component: registry
+    spec:
+      serviceAccountName: aidevos-service-account
+      containers:
+      - name: registry
+        image: ${DOCKER_REGISTRY}/aidevos/registry:${VERSION}
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8001
+        envFrom:
+        - configMapRef:
+            name: aidevos-config
+        - secretRef:
+            name: aidevos-secrets
+        resources:
+          requests:
+            cpu: "100m"
+            memory: "256Mi"
+          limits:
+            cpu: "500m"
+            memory: "512Mi"
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8001
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /ready
+            port: 8001
+          initialDelaySeconds: 5
+          periodSeconds: 5
+---
+# Service Registry Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: registry-service
+  namespace: aidevos-system
+  labels:
+    app: aidevos
+    component: registry
+spec:
+  selector:
+    app: aidevos
+    component: registry
+  ports:
+  - port: 8001
+    targetPort: 8001
+  type: ClusterIP
+---
+# Request Router Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: router-deployment
+  namespace: aidevos-system
+  labels:
+    app: aidevos
+    component: router
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: aidevos
+      component: router
+  template:
+    metadata:
+      labels:
+        app: aidevos
+        component: router
+    spec:
+      serviceAccountName: aidevos-service-account
+      containers:
+      - name: router
+        image: ${DOCKER_REGISTRY}/aidevos/router:${VERSION}
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8000
+        envFrom:
+        - configMapRef:
+            name: aidevos-config
+        - secretRef:
+            name: aidevos-secrets
+        resources:
+          requests:
+            cpu: "200m"
+            memory: "256Mi"
+          limits:
+            cpu: "1000m"
+            memory: "512Mi"
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8000
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /ready
+            port: 8000
+          initialDelaySeconds: 5
+          periodSeconds: 5
+---
+# Router Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: router-service
+  namespace: aidevos-system
+  labels:
+    app: aidevos
+    component: router
+spec:
+  selector:
+    app: aidevos
+    component: router
+  ports:
+  - port: 8000
+    targetPort: 8000
+  type: ClusterIP
+---
+# Event Bus Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: event-bus-deployment
+  namespace: aidevos-system
+  labels:
+    app: aidevos
+    component: event-bus
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: aidevos
+      component: event-bus
+  template:
+    metadata:
+      labels:
+        app: aidevos
+        component: event-bus
+    spec:
+      serviceAccountName: aidevos-service-account
+      containers:
+      - name: event-bus
+        image: ${DOCKER_REGISTRY}/aidevos/event-bus:${VERSION}
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8002
+        envFrom:
+        - configMapRef:
+            name: aidevos-config
+        - secretRef:
+            name: aidevos-secrets
+        resources:
+          requests:
+            cpu: "100m"
+            memory: "256Mi"
+          limits:
+            cpu: "500m"
+            memory: "512Mi"
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8002
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /ready
+            port: 8002
+          initialDelaySeconds: 5
+          periodSeconds: 5
+---
+# Event Bus Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: event-bus-service
+  namespace: aidevos-system
+  labels:
+    app: aidevos
+    component: event-bus
+spec:
+  selector:
+    app: aidevos
+    component: event-bus
+  ports:
+  - port: 8002
+    targetPort: 8002
+  type: ClusterIP
+---
+# Lifecycle Manager Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: lifecycle-deployment
+  namespace: aidevos-system
+  labels:
+    app: aidevos
+    component: lifecycle
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: aidevos
+      component: lifecycle
+  template:
+    metadata:
+      labels:
+        app: aidevos
+        component: lifecycle
+    spec:
+      serviceAccountName: aidevos-service-account
+      containers:
+      - name: lifecycle
+        image: ${DOCKER_REGISTRY}/aidevos/lifecycle:${VERSION}
+        imagePullPolicy: Always
+        envFrom:
+        - configMapRef:
+            name: aidevos-config
+        - secretRef:
+            name: aidevos-secrets
+        resources:
+          requests:
+            cpu: "100m"
+            memory: "256Mi"
+          limits:
+            cpu: "500m"
+            memory: "512Mi"
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8003
+          initialDelaySeconds: 30
+          periodSeconds: 10
+---
+# State Manager Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: state-manager-deployment
+  namespace: aidevos-system
+  labels:
+    app: aidevos
+    component: state-manager
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: aidevos
+      component: state-manager
+  template:
+    metadata:
+      labels:
+        app: aidevos
+        component: state-manager
+    spec:
+      serviceAccountName: aidevos-service-account
+      containers:
+      - name: state-manager
+        image: ${DOCKER_REGISTRY}/aidevos/state-manager:${VERSION}
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8004
+        envFrom:
+        - configMapRef:
+            name: aidevos-config
+        - secretRef:
+            name: aidevos-secrets
+        resources:
+          requests:
+            cpu: "100m"
+            memory: "512Mi"
+          limits:
+            cpu: "500m"
+            memory: "1Gi"
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8004
+          initialDelaySeconds: 30
+          periodSeconds: 10
+---
+# State Manager Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: state-manager-service
+  namespace: aidevos-system
+  labels:
+    app: aidevos
+    component: state-manager
+spec:
+  selector:
+    app: aidevos
+    component: state-manager
+  ports:
+  - port: 8004
+    targetPort: 8004
+  type: ClusterIP
+---
+# Default Durable Objects
+---
+# Authentication DO Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: auth-do-deployment
+  namespace: aidevos-system
+  labels:
+    app: aidevos
+    component: do-auth
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: aidevos
+      component: do-auth
+  template:
+    metadata:
+      labels:
+        app: aidevos
+        component: do-auth
+    spec:
+      serviceAccountName: aidevos-service-account
+      containers:
+      - name: auth-do
+        image: ${DOCKER_REGISTRY}/aidevos/do-auth:${VERSION}
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8100
+        envFrom:
+        - configMapRef:
+            name: aidevos-config
+        - secretRef:
+            name: aidevos-secrets
+        resources:
+          requests:
+            cpu: "100m"
+            memory: "256Mi"
+          limits:
+            cpu: "300m"
+            memory: "512Mi"
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8100
+          initialDelaySeconds: 30
+          periodSeconds: 10
+---
+# User Management DO Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: user-do-deployment
+  namespace: aidevos-system
+  labels:
+    app: aidevos
+    component: do-user
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: aidevos
+      component: do-user
+  template:
+    metadata:
+      labels:
+        app: aidevos
+        component: do-user
+    spec:
+      serviceAccountName: aidevos-service-account
+      containers:
+      - name: user-do
+        image: ${DOCKER_REGISTRY}/aidevos/do-user:${VERSION}
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8101
+        envFrom:
+        - configMapRef:
+            name: aidevos-config
+        - secretRef:
+            name: aidevos-secrets
+        resources:
+          requests:
+            cpu: "100m"
+            memory: "256Mi"
+          limits:
+            cpu: "300m"
+            memory: "512Mi"
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8101
+          initialDelaySeconds: 30
+          periodSeconds: 10
+---
+# Data Storage DO Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: data-do-deployment
+  namespace: aidevos-system
+  labels:
+    app: aidevos
+    component: do-data
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: aidevos
+      component: do-data
+  template:
+    metadata:
+      labels:
+        app: aidevos
+        component: do-data
+    spec:
+      serviceAccountName: aidevos-service-account
+      containers:
+      - name: data-do
+        image: ${DOCKER_REGISTRY}/aidevos/do-data:${VERSION}
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8102
+        envFrom:
+        - configMapRef:
+            name: aidevos-config
+        - secretRef:
+            name: aidevos-secrets
+        resources:
+          requests:
+            cpu: "200m"
+            memory: "512Mi"
+          limits:
+            cpu: "500m"
+            memory: "1Gi"
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8102
+          initialDelaySeconds: 30
+          periodSeconds: 10
+---
+# API Gateway DO Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api-do-deployment
+  namespace: aidevos-system
+  labels:
+    app: aidevos
+    component: do-api
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: aidevos
+      component: do-api
+  template:
+    metadata:
+      labels:
+        app: aidevos
+        component: do-api
+    spec:
+      serviceAccountName: aidevos-service-account
+      containers:
+      - name: api-do
+        image: ${DOCKER_REGISTRY}/aidevos/do-api:${VERSION}
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8103
+        envFrom:
+        - configMapRef:
+            name: aidevos-config
+        - secretRef:
+            name: aidevos-secrets
+        resources:
+          requests:
+            cpu: "200m"
+            memory: "256Mi"
+          limits:
+            cpu: "500m"
+            memory: "512Mi"
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8103
+          initialDelaySeconds: 30
+          periodSeconds: 10
+---
+# Ingress for API access
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: aidevos-ingress
+  namespace: aidevos-system
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+spec:
+  tls:
+  - hosts:
+    - api.aidevos.${DOMAIN}
+    secretName: aidevos-tls
+  rules:
+  - host: api.aidevos.${DOMAIN}
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: router-service
+            port:
+              number: 8000
+---
+# Horizontal Pod Autoscaler for Router
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: router-hpa
+  namespace: aidevos-system
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: router-deployment
+  minReplicas: 3
+  maxReplicas: 10
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 70
+  - type: Resource
+    resource:
+      name: memory
+      target:
+        type: Utilization
+        averageUtilization: 80
+---
+# Horizontal Pod Autoscaler for API DO
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: api-do-hpa
+  namespace: aidevos-system
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: api-do-deployment
+  minReplicas: 3
+  maxReplicas: 10
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 70
+  - type: Resource
+    resource:
+      name: memory
+      target:
+        type: Utilization
+        averageUtilization: 80

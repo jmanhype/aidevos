@@ -1,0 +1,67 @@
+{
+  "objects": [
+    {
+      "name": "user_service",
+      "version": "1.0.0",
+      "description": "User authentication and management service",
+      "code_path": "src/services/user_service.py",
+      "dependencies": [],
+      "config": {
+        "max_connections": 100,
+        "timeout_seconds": 30
+      }
+    },
+    {
+      "name": "data_service",
+      "version": "1.0.0",
+      "description": "Data storage and retrieval service",
+      "code_path": "src/services/data_service.py",
+      "dependencies": [
+        "user_service"
+      ],
+      "config": {
+        "max_connections": 50,
+        "timeout_seconds": 60
+      }
+    },
+    {
+      "name": "NotificationServiceDO",
+      "version": "1.0.0",
+      "path": "/Users/speed/aidevos/src/services/notificationservice_service.py",
+      "class_name": "NotificationServiceService",
+      "description": "Core service for managing notifications",
+      "dependencies": [
+        "NotificationStorage",
+        "NotificationProcessor"
+      ],
+      "code_path": "/Users/speed/aidevos/src/services/notificationservice_service.py"
+    },
+    {
+      "name": "TemplateServiceDO",
+      "version": "1.0.0",
+      "path": "/Users/speed/aidevos/src/services/templateservice_service.py",
+      "class_name": "TemplateServiceService",
+      "description": "Service for managing notification templates",
+      "dependencies": [
+        "NotificationStorage"
+      ],
+      "code_path": "/Users/speed/aidevos/src/services/templateservice_service.py"
+    },
+    {
+      "name": "DeliveryServiceDO",
+      "version": "1.0.0",
+      "path": "/Users/speed/aidevos/src/services/deliveryservice_service.py",
+      "class_name": "DeliveryServiceService",
+      "description": "Service for delivering notifications",
+      "dependencies": [
+        "NotificationProcessor",
+        "NotificationStorage"
+      ],
+      "code_path": "/Users/speed/aidevos/src/services/deliveryservice_service.py"
+    }
+  ],
+  "registry": {
+    "url": "http://localhost:8000/registry",
+    "auth_required": false
+  }
+}

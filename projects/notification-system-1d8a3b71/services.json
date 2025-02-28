@@ -1,0 +1,109 @@
+[
+  {
+    "name": "NotificationService",
+    "path": "/Users/speed/aidevos/src/services/notificationservice_service.py",
+    "config": {
+      "name": "NotificationServiceDO",
+      "version": "1.0.0",
+      "path": "/Users/speed/aidevos/src/services/notificationservice_service.py",
+      "class_name": "NotificationServiceService",
+      "description": "Core service for managing notifications",
+      "dependencies": [
+        "NotificationStorage",
+        "NotificationProcessor"
+      ],
+      "code_path": "/Users/speed/aidevos/src/services/notificationservice_service.py"
+    },
+    "deployment": {
+      "status": "success",
+      "deployment": {
+        "service_name": "NotificationService",
+        "version": "1.0.0",
+        "deployed_at": "2025-02-28T08:16:12Z",
+        "status": "active",
+        "endpoints": [
+          "https://api.aidevos.example.com/services/notificationservice",
+          "https://api.aidevos.example.com/services/notificationservice/health"
+        ],
+        "resources": {
+          "cpu": "0.5",
+          "memory": "256Mi",
+          "storage": "1Gi"
+        },
+        "logs": "https://logs.aidevos.example.com/services/notificationservice"
+      },
+      "message": "Service NotificationService deployed successfully"
+    }
+  },
+  {
+    "name": "TemplateService",
+    "path": "/Users/speed/aidevos/src/services/templateservice_service.py",
+    "config": {
+      "name": "TemplateServiceDO",
+      "version": "1.0.0",
+      "path": "/Users/speed/aidevos/src/services/templateservice_service.py",
+      "class_name": "TemplateServiceService",
+      "description": "Service for managing notification templates",
+      "dependencies": [
+        "NotificationStorage"
+      ],
+      "code_path": "/Users/speed/aidevos/src/services/templateservice_service.py"
+    },
+    "deployment": {
+      "status": "success",
+      "deployment": {
+        "service_name": "TemplateService",
+        "version": "1.0.0",
+        "deployed_at": "2025-02-28T08:16:12Z",
+        "status": "active",
+        "endpoints": [
+          "https://api.aidevos.example.com/services/templateservice",
+          "https://api.aidevos.example.com/services/templateservice/health"
+        ],
+        "resources": {
+          "cpu": "0.5",
+          "memory": "256Mi",
+          "storage": "1Gi"
+        },
+        "logs": "https://logs.aidevos.example.com/services/templateservice"
+      },
+      "message": "Service TemplateService deployed successfully"
+    }
+  },
+  {
+    "name": "DeliveryService",
+    "path": "/Users/speed/aidevos/src/services/deliveryservice_service.py",
+    "config": {
+      "name": "DeliveryServiceDO",
+      "version": "1.0.0",
+      "path": "/Users/speed/aidevos/src/services/deliveryservice_service.py",
+      "class_name": "DeliveryServiceService",
+      "description": "Service for delivering notifications",
+      "dependencies": [
+        "NotificationProcessor",
+        "NotificationStorage"
+      ],
+      "code_path": "/Users/speed/aidevos/src/services/deliveryservice_service.py"
+    },
+    "deployment": {
+      "status": "success",
+      "deployment": {
+        "service_name": "DeliveryService",
+        "version": "1.0.0",
+        "deployed_at": "2025-02-28T08:16:12Z",
+        "status": "active",
+        "endpoints": [
+          "https://api.aidevos.example.com/services/deliveryservice",
+          "https://api.aidevos.example.com/services/deliveryservice/health"
+        ],
+        "resources": {
+          "cpu": "0.5",
+          "memory": "256Mi",
+          "storage": "1Gi"
+        },
+        "logs": "https://logs.aidevos.example.com/services/deliveryservice"
+      },
+      "message": "Service DeliveryService deployed successfully"
+    }
+  }
+]
