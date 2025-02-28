@@ -44,7 +44,7 @@ config :logger, :console,
 # Use Jason for JSON parsing in Phoenix
 config :phoenix, :json_library, Jason
 
-config :realworld, :ash_domains, [Realworld.Accounts, Realworld.Articles, Realworld.Profiles]
+config :realworld, :ash_domains, [Realworld.Accounts, Realworld.Articles, Realworld.Profiles, Realworld.DurableObjects.Registry]
 
 config :realworld, ecto_repos: [Realworld.Repo]
 

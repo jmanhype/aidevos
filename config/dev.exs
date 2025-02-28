@@ -66,10 +66,10 @@ config :phoenix, :plug_init_mode, :runtime
 
 # Configure your database
 config :realworld, Realworld.Repo,
-  username: "postgres",
-  password: "postgres",
+  username: "speed",
+  password: "",
   hostname: "localhost",
-  database: "realworld-dev",
+  database: "realworld_dev",
   port: 5432,
   show_sensitive_data_on_connection_error: true,
   pool_size: 10

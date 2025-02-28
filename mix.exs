@@ -55,7 +55,12 @@ defmodule Realworld.MixProject do
       {:picosat_elixir, "~> 0.2"},
       {:slugify, "~> 1.3"},
       {:earmark, "~> 1.4"},
-      {:faker, "~> 0.18", only: :test}
+      {:faker, "~> 0.18", only: :test},
+      
+      # New dependencies for self-modifying objects with reward modeling
+      {:instructor, github: "thmsmlr/instructor_ex", branch: "main"},
+      {:ex_openai, "~> 1.0", as: :openai},
+      {:req, "~> 0.4"}
     ]
   end
 

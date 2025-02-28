@@ -42,6 +42,10 @@ defmodule RealworldWeb.Router do
       live "/editor", EditorLive.Index, :new
       live "/editor/:slug", EditorLive.Index, :edit
       live "/settings", SettingsLive.Index, :index
+      
+      # Durable Objects routes
+      live "/durable-objects", DurableObjectLive, :index
+      live "/durable-objects/:id", DurableObjectLive, :index
     end
   end
 
