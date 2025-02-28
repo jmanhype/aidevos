@@ -99,11 +99,36 @@ AIDevOS can be enhanced with Claude Code, an agentic coding tool from Anthropic:
 
 ## 🧠 DSPy Integration
 
-AIDevOS now includes integration with [DSPy](https://github.com/stanfordnlp/dspy), an advanced language model framework from Stanford NLP:
+AIDevOS includes a rich integration with the DSPy framework to enable LLM-powered agents:
 
-- **Enhanced Agent Reasoning**: Improves agent capabilities with structured language model reasoning
-- **Optimized Prompting**: Uses DSPy's prompt optimization techniques to improve agent outcomes
-- **Separate Implementation**: Available as `dspy_team_collaboration.py` alongside the original implementation
+### ✨ DSPy Agent Classes
+- 📊 `DSPyPMAgent`: Project management tasks including requirements analysis and architecture design
+- 💻 `DSPyDevAgent`: Development tasks including code generation and code review
+- 🔧 `DSPyDevOpsAgent`: DevOps tasks including deployment planning and infrastructure design
+- 🎨 `DSPyUXAgent`: UX tasks including UI design and usability testing
+
+### 🔄 Agent Architecture
+```mermaid
+graph TD
+    A[DSPyAgent Base Class] --> B[DSPyPMAgent]
+    A --> C[DSPyDevAgent]
+    A --> D[DSPyDevOpsAgent]
+    A --> E[DSPyUXAgent]
+    
+    B --> F[Requirements Analysis]
+    B --> G[Architecture Design]
+    
+    C --> H[Code Generation]
+    C --> I[Code Review]
+    
+    D --> J[Deployment Planning]
+    D --> K[Infrastructure Design]
+    
+    E --> L[UI Design]
+    E --> M[Usability Testing]
+```
+
+All agent classes implement a standardized `process_task` async method, allowing seamless integration with both synchronous and asynchronous workflows.
 
 ### Key DSPy Features in AIDevOS:
 
