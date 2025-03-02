@@ -15,6 +15,17 @@ defmodule Realworld.DurableObjects do
   end
   
   @doc """
+  Counts the total number of durable objects.
+  
+  ## Returns
+  
+  Integer count of objects
+  """
+  def count_objects do
+    length(list_objects())
+  end
+  
+  @doc """
   Gets a durable object by ID.
   
   Returns nil if the object does not exist.
@@ -23,6 +34,28 @@ defmodule Realworld.DurableObjects do
     case Ash.get(Object, id) do
       %Object{} = object -> object
       nil -> nil
+    end
+  rescue
+    _ -> nil
+  end
+  
+  @doc """
+  Gets a durable object by name.
+  
+  ## Parameters
+  
+  - name: The name of the object to find
+  
+  ## Returns
+  
+  The object if found, nil otherwise
+  """
+  def get_object_by_name(name) do
+    objects = Ash.read!(Object, filter: [name: [equals: name]])
+    
+    case objects do
+      [object | _] -> object
+      [] -> nil
     end
   rescue
     _ -> nil
