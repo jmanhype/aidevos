@@ -67,6 +67,9 @@ This application includes a system for creating and managing Durable Objects - s
 - Modify existing objects with natural language prompts
 - Deploy objects to different environments
 - Voice command integration via Twilio
+- Query objects by name with `get_object_by_name/1`
+- Count total objects with `count_objects/0`
+- List all users with `list_users/0`
 
 ## Documentation
 
@@ -77,4 +80,4 @@ For detailed information about the system's features, please refer to:
 - [SMS Integration Documentation](README.sms_integration.md) - How to use SMS commands with the system
 
 # Sending a Pull Request
-The consultants at Alembic are monitoring for pull requests when they are “on the beach” (aka when they are not billable or working with a client). We will review your pull request and either merge it, request changes to it, or close it with an explanation. For changes raised when there are no consultants on the beach, please expect some delay. We will do our best to provide update and feedback throughout the process.
+The consultants at Alembic are monitoring for pull requests when they are "on the beach" (aka when they are not billable or working with a client). We will review your pull request and either merge it, request changes to it, or close it with an explanation. For changes raised when there are no consultants on the beach, please expect some delay. We will do our best to provide update and feedback throughout the process.

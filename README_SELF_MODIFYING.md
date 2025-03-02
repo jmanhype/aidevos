@@ -41,6 +41,7 @@ Multiple layers of safety are built into the system:
 5. **Creation Pipeline**: Generates new code and files from scratch based on requirements
 6. **Deployment System**: Safely loads and tests modified code
 7. **LiveView Interface**: User interface for managing objects and modifications
+8. **Voice Command Integration**: Control and query the system using voice commands via Twilio
 
 ### Key Files
 
