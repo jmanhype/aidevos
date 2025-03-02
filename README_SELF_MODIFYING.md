@@ -47,6 +47,40 @@ Multiple layers of safety are built into the system:
 11. **Slack Integration**: Send messages to Slack channels
 12. **GitHub Integration**: Interact with GitHub repositories
 
+```mermaid
+graph TD
+    A[Durable Objects System] --> B[Object Management]
+    A --> C[Communication Channels]
+    A --> D[AI Components]
+    A --> E[Safety Mechanisms]
+    
+    B --> B1[Object Resource]
+    B --> B2[Version Control]
+    B --> B3[Deployment System]
+    B --> B4[File System Integration]
+    
+    C --> C1[Voice Integration]
+    C --> C2[SMS Integration]
+    C --> C3[Email Integration]
+    C --> C4[Slack Integration]
+    C --> C5[GitHub Integration]
+    
+    D --> D1[Command Parser]
+    D --> D2[Code Generator]
+    D --> D3[Reward Modeling]
+    D --> D4[Instructor Schemas]
+    
+    E --> E1[Validation Chain]
+    E --> E2[Threshold-Based Acceptance]
+    E --> E3[Rollback Capabilities]
+    E --> E4[Audit Logging]
+    
+    F[User Interfaces] --> A
+    F --> F1[Web UI]
+    F --> F2[LiveView Interface]
+    F --> F3[Command Line]
+```
+
 ### Key Files
 
 - `lib/realworld/durable_objects/object.ex`: Core resource definition
@@ -183,6 +217,39 @@ The system leverages several AI components to enable its self-modifying capabili
    - Structured schemas for AI outputs
    - Ensures consistency and validation of AI-generated content
    - Includes schemas for code plans, constraint checks, and more
+
+```mermaid
+sequenceDiagram
+    participant User
+    participant Parser as Command Parser
+    participant Planner as Code Planner
+    participant Generator as Code Generator
+    participant Evaluator as Reward Evaluator
+    participant Deployer as Deployment System
+    
+    User->>Parser: Natural Language Request
+    Parser->>Planner: Structured Command
+    
+    Planner->>Planner: Create Modification Plan
+    Planner->>Generator: Plan with Constraints
+    
+    Generator->>Generator: Generate Code Changes
+    Generator->>Evaluator: Proposed Code Changes
+    
+    Evaluator->>Evaluator: Evaluate Human Preferences
+    Evaluator->>Evaluator: Check Constraints
+    Evaluator->>Evaluator: Verify Factuality
+    
+    alt Meets Thresholds
+        Evaluator->>Deployer: Approved Changes
+        Deployer->>Deployer: Deploy Changes
+        Deployer->>User: Success Notification
+    else Below Thresholds
+        Evaluator->>Generator: Feedback for Improvement
+        Generator->>Evaluator: Revised Changes
+        Note over Generator,Evaluator: Feedback Loop
+    end
+```
 
 ## Environment Variables
 

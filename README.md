@@ -6,6 +6,41 @@ An intelligent system for creating, modifying, and deploying code at runtime thr
 
 The Autonomous Development System is a self-modifying codebase that allows you to create and modify code through various interfaces including a web UI, voice commands, SMS, and more. The system uses AI to transform natural language descriptions into working code that can be deployed immediately.
 
+```mermaid
+graph TD
+    A[User Interfaces] --> B[Command Processing]
+    B --> C[Object Management]
+    B --> D[Event Monitoring]
+    
+    A --> A1[Web UI]
+    A --> A2[Voice Calls]
+    A --> A3[SMS]
+    A --> A4[Email]
+    A --> A5[Slack]
+    
+    B --> B1[Command Parser]
+    B --> B2[Command Processor]
+    B --> B3[Task Manager]
+    
+    C --> C1[Object Creation]
+    C --> C2[Object Modification]
+    C --> C3[Object Deployment]
+    
+    D --> D1[Event Detection]
+    D --> D2[Notification System]
+    
+    E[External Integrations] --> A
+    E --> E1[Twilio]
+    E --> E2[OpenAI]
+    E --> E3[GitHub]
+    E --> E4[Slack API]
+    
+    F[AI Components] --> C
+    F --> F1[Code Generation]
+    F --> F2[Constraint Checking]
+    F --> F3[Reward Modeling]
+```
+
 ## Key Features
 
 ### Object Management
@@ -49,6 +84,49 @@ For detailed information about the system's features, please refer to:
 - [Self-Modifying Objects Documentation](README_SELF_MODIFYING.md) - Details on the self-modifying code architecture
 - [Command Parser Architecture](README.command_parser.md) - How natural language commands are parsed
 - [Command Processor Architecture](README.command_processor.md) - How commands are executed
+- [Autonomous Voice System](README.autonomous_voice_system.md) - Architecture of the voice command system
+- [Email Configuration](README.email.md) - Email system configuration and usage
+- [Email Update Information](README.email_update.md) - Updates to the email configuration
+
+### Generated Code Documentation
+
+- [WeatherForecast](priv/generated_code/WeatherForecast/README.md) - Weather forecast service
+- [SimpleCalculator](priv/generated_code/SimpleCalculator/README.md) - Basic calculator module
+- [FileProcessor](priv/generated_code/FileProcessor/README.md) - File processing library
+
+## Communication Flow
+
+The following diagram illustrates how commands flow through the system:
+
+```mermaid
+sequenceDiagram
+    participant User
+    participant Interface as User Interface
+    participant Parser as Command Parser
+    participant Processor as Command Processor
+    participant Objects as Durable Objects
+    participant AI as AI Components
+    participant Notifier as Notification System
+    
+    User->>Interface: Issue Command
+    Interface->>Parser: Forward Command
+    Parser->>Processor: Structured Command
+    
+    alt Create Object
+        Processor->>AI: Generate Code
+        AI->>Objects: Create Object
+    else Modify Object
+        Processor->>Objects: Get Object
+        Objects->>AI: Current Object
+        AI->>Objects: Modified Object
+    else Monitor Event
+        Processor->>Notifier: Set Up Monitor
+    end
+    
+    Objects-->>Processor: Result
+    Processor-->>Interface: Response
+    Interface-->>User: Notification
+```
 
 ## Installation
 

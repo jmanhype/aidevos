@@ -19,6 +19,47 @@ The Command Parser is implemented in the `Realworld.VoiceCommands.CommandParser`
 
 The parser recognizes several types of commands, each represented by a specific command struct:
 
+```mermaid
+classDiagram
+    class Command {
+        +String original_text
+    }
+    class CreateCommand {
+        +String name
+        +String description
+        +String object_type
+    }
+    class ModifyCommand {
+        +String object_name
+        +String modification
+    }
+    class MonitorCommand {
+        +String event_type
+        +List~Map~ conditions
+        +String notification_type
+    }
+    class InfoCommand {
+        +String name
+    }
+    class ListCommand {
+        +String type
+    }
+    class CountCommand {
+        +String type
+    }
+    class UnknownCommand {
+        +List~String~ possible_intents
+    }
+    
+    Command <|-- CreateCommand
+    Command <|-- ModifyCommand
+    Command <|-- MonitorCommand
+    Command <|-- InfoCommand
+    Command <|-- ListCommand
+    Command <|-- CountCommand
+    Command <|-- UnknownCommand
+```
+
 1. **CreateCommand**: For creating new objects
    ```elixir
    %CreateCommand{name: "WeatherWidget", description: "A widget that displays weather information"}
@@ -58,6 +99,23 @@ The parsing process follows these steps:
 3. **Extract Parameters**: Extract relevant parameters based on the command type
 4. **Validate Command**: Ensure the command has all required parameters
 5. **Create Command Object**: Create a structured command object for processing
+
+```mermaid
+flowchart TD
+    A[Natural Language Input] --> B[Normalize Text]
+    B --> C[Identify Command Type]
+    C -->|Create Command| D1[Extract Object Name/Description]
+    C -->|Modify Command| D2[Extract Object Name/Modification]
+    C -->|Monitor Command| D3[Extract Event/Notification Method]
+    C -->|Query Command| D4[Extract Query Parameters]
+    C -->|Unknown| D5[Generate Error]
+    D1 --> E[Create Command Object]
+    D2 --> E
+    D3 --> E
+    D4 --> E
+    D5 --> F[Error Response]
+    E --> G[Return Structured Command]
+```
 
 ## Implementation
 

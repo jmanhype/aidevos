@@ -10,6 +10,17 @@ Durable Objects can exist in the following states:
 - **Active**: Objects that have been reviewed and activated. Only active objects can be fully used in the system.
 - **Deployed**: Objects that have been deployed to a specific environment.
 
+```mermaid
+stateDiagram-v2
+    [*] --> Draft: Create Object
+    Draft --> Active: Activate
+    Active --> Active: Modify
+    Active --> Deployed: Deploy
+    Deployed --> Active: Update
+    Active --> [*]: Delete
+    Deployed --> [*]: Delete
+```
+
 ## Object Creation Process
 
 1. **Creation**: Objects can be created in two ways:
@@ -38,6 +49,21 @@ Durable Objects can exist in the following states:
    - Development
    - Staging
    - Production
+
+```mermaid
+flowchart TD
+    A[User Request] -->|Create Object| B[Generate Code]
+    B --> C[Save as Draft]
+    C --> D{Review Code}
+    D -->|Approve| E[Activate Object]
+    D -->|Modify| F[Update Requirements]
+    F --> B
+    E --> G{Deploy?}
+    G -->|Yes| H[Select Environment]
+    H --> I[Deploy Object]
+    G -->|No| J[Use in System]
+    I --> J
+```
 
 ## Voice Command Integration
 

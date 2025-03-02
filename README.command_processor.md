@@ -27,6 +27,28 @@ The command processing flow follows these steps:
 5. **Response Generation**: A response is generated based on the execution result
 6. **Notification**: The user is notified of the result via their preferred method (voice, SMS, etc.)
 
+```mermaid
+sequenceDiagram
+    participant User
+    participant Parser as Command Parser
+    participant Processor as Command Processor
+    participant TaskManager
+    participant DurableObjects
+    participant Notifier
+    
+    User->>Parser: Natural Language Command
+    Parser->>Processor: Structured Command Object
+    Processor->>Processor: Validate Command
+    Processor->>TaskManager: Create Task
+    TaskManager-->>Processor: Task Created
+    Processor->>User: Immediate Acknowledgment
+    
+    TaskManager->>DurableObjects: Execute Command
+    DurableObjects-->>TaskManager: Command Result
+    TaskManager->>Notifier: Send Notification
+    Notifier->>User: Final Result Notification
+```
+
 ## Implementation
 
 The main processing function is `process/1`, which takes a command object and returns a result:
@@ -61,6 +83,34 @@ end
 ## Command Handlers
 
 Each command type has a specialized handler function:
+
+```mermaid
+flowchart TD
+    A[Command Processor] --> B{Command Type}
+    B -->|MonitorCommand| C1[Monitor Handler]
+    B -->|CreateCommand| C2[Create Handler]
+    B -->|ModifyCommand| C3[Modify Handler]
+    B -->|InfoCommand| C4[Info Handler]
+    B -->|ListCommand| C5[List Handler]
+    B -->|CountCommand| C6[Count Handler]
+    B -->|Unknown| C7[Error Handler]
+    
+    C1 --> D1[Event Monitoring]
+    C2 --> D2[Object Creation]
+    C3 --> D3[Object Modification]
+    C4 --> D4[Object Information]
+    C5 --> D5[Object Listing]
+    C6 --> D6[Object Counting]
+    C7 --> D7[Error Response]
+    
+    D1 --> E[Response Generation]
+    D2 --> E
+    D3 --> E
+    D4 --> E
+    D5 --> E
+    D6 --> E
+    D7 --> E
+```
 
 ### Monitor Command Handler
 

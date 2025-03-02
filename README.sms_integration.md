@@ -31,6 +31,23 @@ The SMS integration allows you to send text messages to your system and have it 
 
 You can send the following types of SMS commands to your system:
 
+```mermaid
+graph TD
+    A[SMS Commands] --> B[Object Management]
+    A --> C[Monitoring]
+    A --> D[Queries]
+    
+    B --> B1[create object_name description]
+    B --> B2[modify object_name changes]
+    
+    C --> C1[text me when event_description]
+    
+    D --> D1[info object_name]
+    D --> D2[list objects]
+    D --> D3[count objects]
+    D --> D4[list users]
+```
+
 ### Create a New Object
 
 ```
@@ -105,6 +122,29 @@ When you send an SMS to the system, the following process occurs:
 6. **Acknowledgment**: An immediate response is sent to confirm receipt of your command.
 7. **Command Execution**: The system executes your command in the background.
 8. **Result Notification**: Once the command is completed, you receive an SMS with the result.
+
+```mermaid
+sequenceDiagram
+    participant User
+    participant Twilio
+    participant Webhook as SMS Webhook
+    participant Parser as Command Parser
+    participant Processor as Command Processor
+    participant TaskManager
+    
+    User->>Twilio: Send SMS Command
+    Twilio->>Webhook: Forward SMS to Webhook
+    Webhook->>Webhook: Identify User by Phone
+    Webhook->>Parser: Parse Command Text
+    Parser->>Processor: Structured Command
+    Processor->>TaskManager: Create Task
+    Webhook->>Twilio: Send Acknowledgment
+    Twilio->>User: SMS Acknowledgment
+    
+    TaskManager->>TaskManager: Process Task Asynchronously
+    TaskManager->>Twilio: Send Result SMS
+    Twilio->>User: SMS with Result
+```
 
 ## Implementation Details
 

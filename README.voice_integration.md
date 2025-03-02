@@ -72,6 +72,33 @@ This will set up monitoring for the specified event and call you when it occurs.
 7. The system confirms receipt of your request
 8. When the task is completed, the system calls you back with the result
 
+```mermaid
+sequenceDiagram
+    participant User
+    participant Twilio
+    participant Webhook as Voice Webhook
+    participant Parser as Command Parser
+    participant Processor as Command Processor
+    participant TaskManager
+    
+    User->>Twilio: Call Twilio Number
+    Twilio->>Webhook: Incoming Call Webhook
+    Webhook->>Twilio: TwiML Response (Prompt)
+    Twilio->>User: "What would you like to do?"
+    User->>Twilio: Speak Command
+    Twilio->>Webhook: Speech Command Webhook
+    Note over Twilio,Webhook: With transcribed text
+    Webhook->>Parser: Parse Command
+    Parser->>Processor: Structured Command
+    Processor->>TaskManager: Create Task
+    Webhook->>Twilio: TwiML Response (Acknowledgment)
+    Twilio->>User: "I've received your request"
+    
+    TaskManager->>TaskManager: Process Task Asynchronously
+    TaskManager->>Twilio: Make Outbound Call
+    Twilio->>User: Call with Result
+```
+
 ## Example Use Case
 
 As demonstrated in the example, you can say:
