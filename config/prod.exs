@@ -47,3 +47,9 @@ config :logger, level: :info
 #       force_ssl: [hsts: true]
 #
 # Check `Plug.SSL` for all available options in `force_ssl`.
+
+# Configure Bamboo mailer for production to use SendGrid
+config :realworld, Realworld.Mailer,
+  adapter: Bamboo.SendGridAdapter,
+  api_key: System.get_env("SENDGRID_API_KEY"),
+  from_email: System.get_env("FROM_EMAIL") || "noreply@example.com"

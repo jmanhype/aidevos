@@ -21,10 +21,37 @@ config :realworld, RealworldWeb.Endpoint,
 #
 # For production it's recommended to configure a different adapter
 # at the `config/runtime.exs`.
-config :realworld, Realworld.Mailer, adapter: Swoosh.Adapters.Local
+config :realworld, Realworld.Mailer,
+  adapter: Bamboo.TestAdapter,
+  from_email: System.get_env("FROM_EMAIL") || "noreply@example.com"
 
 # Swoosh API client is needed for adapters other than SMTP.
 config :swoosh, :api_client, false
+
+# Configure external service integrations
+config :realworld, :twilio,
+  account_sid: System.get_env("TWILIO_ACCOUNT_SID"),
+  auth_token: System.get_env("TWILIO_AUTH_TOKEN"),
+  phone_number: System.get_env("TWILIO_PHONE_NUMBER")
+
+config :realworld, :slack,
+  bot_token: System.get_env("SLACK_BOT_TOKEN"),
+  test_channel: System.get_env("SLACK_TEST_CHANNEL")
+
+config :realworld, :github,
+  token: System.get_env("GITHUB_TOKEN"),
+  repo: System.get_env("GITHUB_REPO"),
+  test_issue: System.get_env("GITHUB_TEST_ISSUE")
+
+config :realworld, :test_accounts,
+  phone: System.get_env("TEST_PHONE_NUMBER"),
+  email: System.get_env("TEST_EMAIL"),
+  cli_user: System.get_env("AUTODEV_USER")
+
+# Configure ex_twilio
+config :ex_twilio,
+  account_sid: System.get_env("TWILIO_ACCOUNT_SID"),
+  auth_token: System.get_env("TWILIO_AUTH_TOKEN")
 
 # Configure esbuild (the version is required)
 config :esbuild,
@@ -44,12 +71,31 @@ config :logger, :console,
 # Use Jason for JSON parsing in Phoenix
 config :phoenix, :json_library, Jason
 
-config :realworld, :ash_domains, [Realworld.Accounts, Realworld.Articles, Realworld.Profiles, Realworld.DurableObjects.Registry]
+config :realworld, :ash_domains, [Realworld.Accounts, Realworld.Articles, Realworld.Profiles, Realworld.DurableObjects.Registry, Realworld.AutoDev]
 
 config :realworld, ecto_repos: [Realworld.Repo]
 
 config :realworld,
   token_signing_secret: "WJ/qX8VMGRT192yLhUvJrRM32W1iycdvKVzOVfk6pJSDqF2rRRyhluZW1NRUyo83"
+
+config :realworld, :twilio,
+  account_sid: System.get_env("TWILIO_ACCOUNT_SID"),
+  auth_token: System.get_env("TWILIO_AUTH_TOKEN"),
+  phone_number: System.get_env("TWILIO_PHONE_NUMBER")
+
+config :realworld, :slack,
+  bot_token: System.get_env("SLACK_BOT_TOKEN"),
+  test_channel: System.get_env("SLACK_TEST_CHANNEL")
+
+config :realworld, :github,
+  token: System.get_env("GITHUB_TOKEN"),
+  repo: System.get_env("GITHUB_REPO"),
+  test_issue: System.get_env("GITHUB_TEST_ISSUE")
+
+config :realworld, :test_accounts,
+  phone: System.get_env("TEST_PHONE_NUMBER"),
+  email: System.get_env("TEST_EMAIL"),
+  cli_user: System.get_env("AUTODEV_USER")
 
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.

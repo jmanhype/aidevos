@@ -1,110 +1,129 @@
 defmodule Realworld.DurableObjects.RewardModeling.Judger do
   @moduledoc """
-  The Judger combines the results from multiple evaluation dimensions (human preferences,
-  constraints, factuality) and makes a final decision on whether a code modification
-  should be accepted.
+  Judges whether generated code meets quality standards.
   
-  It applies configurable thresholds for each evaluation dimension and calculates a
-  weighted score to determine acceptance.
+  This module combines the results from the ConstraintChecker, FactualityChecker,
+  and PreferenceEvaluator to determine if the generated code is acceptable.
   """
   
-  # Default weights for the different evaluation dimensions
-  @default_weights %{
-    preference: 0.4,
-    constraint: 0.3,
-    factuality: 0.3
-  }
-  
   @doc """
-  Checks if an evaluation result should be accepted.
+  Judges whether generated code meets quality standards.
   
   ## Parameters
   
-  - evaluation: The evaluation result, typically from the judge/2 function
+  - evaluation: The evaluation results from the checkers
+  - thresholds: The minimum score thresholds for each category
   
   ## Returns
   
-  Boolean indicating whether the evaluation is accepted
+  `{:ok, %{accepted: boolean, rejection_reason: string}}` if successful, `{:error, reason}` otherwise
   """
-  def accept?({:ok, evaluation}) do
-    Map.get(evaluation, :accepted, false)
-  end
-  
-  def accept?(_) do
-    false
-  end
-  
-  @doc """
-  Judge a modification based on evaluation results and configured thresholds.
-  
-  ## Parameters
-  
-  - evaluation_results: Map containing results for the different evaluation dimensions
-  - thresholds: Map containing acceptance thresholds for each dimension
-  
-  ## Returns
-  
-  A map containing:
-  - accepted: Whether the modification is accepted
-  - score: The weighted score
-  - rejection_reason: If rejected, the reason why
-  """
-  def judge(evaluation_results, thresholds) do
-    # Extract scores from evaluation results
-    preference_score = get_dimension_score(evaluation_results, :preference)
-    constraint_score = get_dimension_score(evaluation_results, :constraint)
-    factuality_score = get_dimension_score(evaluation_results, :factuality)
+  def judge(evaluation, thresholds) do
+    # Extract scores
+    constraint_score = evaluation.constraint_score
+    factuality_score = evaluation.factuality_score
+    preference_score = evaluation.preference_score
     
-    # Calculate weighted score
-    weights = @default_weights
-    weighted_score = 
-      (preference_score * weights.preference) +
-      (constraint_score * (Map.get(weights, :constraint, 0))) +
-      (factuality_score * (Map.get(weights, :factuality, 0)))
+    # Extract thresholds
+    constraint_threshold = thresholds.constraint_threshold
+    factuality_threshold = thresholds.factuality_threshold
+    preference_threshold = thresholds.preference_threshold
     
-    # Normalize by actual weight sum
-    actual_weight_sum = 
-      weights.preference + 
-      (if Map.has_key?(evaluation_results, :constraint), do: weights.constraint, else: 0) +
-      (if Map.has_key?(evaluation_results, :factuality), do: weights.factuality, else: 0)
-    
-    normalized_score = weighted_score / actual_weight_sum
-    
-    # Check individual dimension thresholds
-    {passed, rejection_reason} = cond do
-      Map.has_key?(evaluation_results, :constraint) && 
-      constraint_score < thresholds.constraint_threshold ->
-        {false, "Constraint score #{constraint_score} below threshold #{thresholds.constraint_threshold}"}
+    # Determine if the code meets all thresholds
+    cond do
+      constraint_score < constraint_threshold ->
+        {:ok, %{
+          accepted: false,
+          rejection_reason: "Constraint score #{constraint_score} below threshold #{constraint_threshold}",
+          scores: %{
+            constraint: constraint_score,
+            factuality: factuality_score,
+            preference: preference_score
+          },
+          feedback: %{
+            constraint: evaluation.constraint_feedback,
+            factuality: evaluation.factuality_feedback,
+            preference: evaluation.preference_feedback
+          },
+          detailed_reason: """
+          The code does not meet constraint requirements:
+          
+          #{evaluation.constraint_feedback}
+          
+          Key issues:
+          - Constraint score: #{constraint_score} (threshold: #{constraint_threshold})
+          - Factuality score: #{factuality_score} (threshold: #{factuality_threshold})
+          - Preference score: #{preference_score} (threshold: #{preference_threshold})
+          """
+        }}
         
-      Map.has_key?(evaluation_results, :factuality) && 
-      factuality_score < thresholds.factuality_threshold ->
-        {false, "Factuality score #{factuality_score} below threshold #{thresholds.factuality_threshold}"}
+      factuality_score < factuality_threshold ->
+        {:ok, %{
+          accepted: false,
+          rejection_reason: "Factuality score #{factuality_score} below threshold #{factuality_threshold}",
+          scores: %{
+            constraint: constraint_score,
+            factuality: factuality_score,
+            preference: preference_score
+          },
+          feedback: %{
+            constraint: evaluation.constraint_feedback,
+            factuality: evaluation.factuality_feedback,
+            preference: evaluation.preference_feedback
+          },
+          detailed_reason: """
+          The code does not meet factuality requirements:
+          
+          #{evaluation.factuality_feedback}
+          
+          Key issues:
+          - Constraint score: #{constraint_score} (threshold: #{constraint_threshold})
+          - Factuality score: #{factuality_score} (threshold: #{factuality_threshold})
+          - Preference score: #{preference_score} (threshold: #{preference_threshold})
+          """
+        }}
         
-      preference_score < thresholds.preference_threshold ->
-        {false, "Preference score #{preference_score} below threshold #{thresholds.preference_threshold}"}
+      preference_score < preference_threshold ->
+        {:ok, %{
+          accepted: false,
+          rejection_reason: "Preference score #{preference_score} below threshold #{preference_threshold}",
+          scores: %{
+            constraint: constraint_score,
+            factuality: factuality_score,
+            preference: preference_score
+          },
+          feedback: %{
+            constraint: evaluation.constraint_feedback,
+            factuality: evaluation.factuality_feedback,
+            preference: evaluation.preference_feedback
+          },
+          detailed_reason: """
+          The code does not meet preference requirements:
+          
+          #{evaluation.preference_feedback}
+          
+          Key issues:
+          - Constraint score: #{constraint_score} (threshold: #{constraint_threshold})
+          - Factuality score: #{factuality_score} (threshold: #{factuality_threshold})
+          - Preference score: #{preference_score} (threshold: #{preference_threshold})
+          """
+        }}
         
       true ->
-        {true, nil}
-    end
-    
-    # Return judgment result
-    %{
-      accepted: passed,
-      score: normalized_score,
-      individual_scores: %{
-        preference: preference_score,
-        constraint: constraint_score,
-        factuality: factuality_score
-      },
-      rejection_reason: rejection_reason
-    }
-  end
-  
-  # Helper function to safely get a dimension score from evaluation results
-  defp get_dimension_score(evaluation_results, dimension) do
-    case Map.get(evaluation_results, dimension) do
-      nil -> 1.0  # If dimension wasn't evaluated, assume perfect score
-      result -> Map.get(result, :score, 1.0)
+        {:ok, %{
+          accepted: true,
+          acceptance_reason: "All scores meet thresholds",
+          scores: %{
+            constraint: constraint_score,
+            factuality: factuality_score,
+            preference: preference_score
+          },
+          feedback: %{
+            constraint: evaluation.constraint_feedback,
+            factuality: evaluation.factuality_feedback,
+            preference: evaluation.preference_feedback
+          }
+        }}
     end
   end
 end

@@ -54,6 +54,16 @@ defmodule RealworldWeb.Router do
   #   pipe_through :api
   # end
 
+  # Voice webhook routes for Twilio
+  scope "/webhooks", RealworldWeb do
+    pipe_through :api
+    
+    post "/voice", VoiceController, :webhook
+    post "/voice/command", VoiceController, :command
+    get "/voice/recent", VoiceController, :recent_calls
+    post "/sms", SmsController, :webhook
+  end
+
   # Enables LiveDashboard only for development
   #
   # If you want to use the LiveDashboard in production, you should put

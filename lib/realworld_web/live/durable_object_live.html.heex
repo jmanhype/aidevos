@@ -1,10 +1,29 @@
 <div class="container mx-auto px-4 py-6">
   <div class="flex justify-between items-center mb-6">
     <h1 class="text-2xl font-bold">Durable Objects</h1>
-    <button phx-click="new_object" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
-      New Object
-    </button>
+    <div class="flex space-x-2">
+      <button phx-click="new_object" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
+        New Object
+      </button>
+      <button phx-click="new_object_from_scratch" class="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700">
+        Create From Scratch
+      </button>
+    </div>
   </div>
+  
+  <%= if @creating_from_scratch do %>
+    <div class="bg-white shadow-md rounded-lg p-6 mb-6">
+      <h2 class="text-xl font-semibold mb-4">Creating Object From Scratch...</h2>
+      <div class="flex items-center">
+        <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-blue-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+        </svg>
+        <span><%= @creation_status %></span>
+      </div>
+      <p class="mt-4 text-sm text-gray-600">This may take a few minutes as we plan, generate, and evaluate the code...</p>
+    </div>
+  <% end %>
   
   <%= if @form_visible do %>
     <div class="bg-white shadow-md rounded-lg p-6 mb-6">
@@ -46,6 +65,34 @@ end</textarea>
             </div>
           </form>
           
+        <% :new_from_scratch -> %>
+          <h2 class="text-xl font-semibold mb-4">Create Object From Scratch with AI</h2>
+          <form phx-submit="create_object_from_scratch">
+            <div class="mb-4">
+              <label class="block text-gray-700 mb-2">Name</label>
+              <input type="text" name="object[name]" class="w-full px-3 py-2 border rounded" required />
+            </div>
+            
+            <div class="mb-4">
+              <label class="block text-gray-700 mb-2">Description</label>
+              <textarea name="object[description]" class="w-full px-3 py-2 border rounded" rows="2" required></textarea>
+            </div>
+            
+            <div class="mb-4">
+              <label class="block text-gray-700 mb-2">Requirements (Detailed Prompt)</label>
+              <textarea name="object[prompt]" class="w-full px-3 py-2 border rounded" rows="8" required placeholder="Describe in detail what you want this object to do. Include functionality, requirements, constraints, and any other relevant information."></textarea>
+            </div>
+            
+            <div class="flex justify-end space-x-2">
+              <button type="button" phx-click="cancel_form" class="px-4 py-2 bg-gray-300 text-gray-800 rounded hover:bg-gray-400">
+                Cancel
+              </button>
+              <button type="submit" class="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700">
+                Create From Scratch
+              </button>
+            </div>
+          </form>
+          
         <% :modify -> %>
           <h2 class="text-xl font-semibold mb-4">Modify Object with AI</h2>
           <form phx-submit="submit_modification">
@@ -81,7 +128,7 @@ end</textarea>
             <ul class="divide-y">
               <%= for object <- @objects do %>
                 <li>
-                  <a href={~p"/durable-objects/#{object.id}"} class="block px-3 py-3 hover:bg-gray-50">
+                  <a phx-click="select_object" phx-value-id={object.id} class="block px-3 py-3 hover:bg-gray-50 cursor-pointer">
                     <div class="font-medium"><%= object.name %></div>
                     <div class="text-sm text-gray-600">Version: <%= object.version %></div>
                     <div class="text-sm">
@@ -99,90 +146,77 @@ end</textarea>
     </div>
     
     <div class="lg:col-span-2">
-      <%= if @selected_object do %>
-        <div class="bg-white shadow-md rounded-lg overflow-hidden">
-          <div class="px-6 py-4 bg-gray-100 border-b flex justify-between items-center">
-            <h2 class="text-xl font-semibold"><%= @selected_object.name %></h2>
-            <div class="flex space-x-2">
-              <button phx-click="modify_object" class="px-3 py-1 bg-blue-600 text-white text-sm rounded hover:bg-blue-700">
-                Modify with AI
+      <div class="flex-1 p-6">
+        <%= if @selected_object do %>
+          <div class="mb-4">
+            <h2 class="text-2xl font-bold"><%= @selected_object.name %></h2>
+            <p class="text-gray-600"><%= @selected_object.description %></p>
+            
+            <div class="flex mt-2 space-x-2">
+              <%= if @selected_object.status == "draft" do %>
+                <button phx-click="activate_object" class="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded">
+                  Activate Object
+                </button>
+              <% end %>
+              
+              <button phx-click="modify_object" class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded">
+                Modify
               </button>
               
               <div class="relative inline-block">
-                <button id="deployDropdown" class="px-3 py-1 bg-green-600 text-white text-sm rounded hover:bg-green-700">
+                <button id="deployDropdown" class="bg-purple-500 hover:bg-purple-600 text-white px-3 py-1 rounded">
                   Deploy
                 </button>
-                <div class="hidden absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg z-10">
-                  <a href="#" phx-click="deploy_object" phx-value-environment="development" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Development</a>
-                  <a href="#" phx-click="deploy_object" phx-value-environment="testing" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Testing</a>
-                  <a href="#" phx-click="deploy_object" phx-value-environment="staging" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Staging</a>
-                  <a href="#" phx-click="deploy_object" phx-value-environment="production" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Production</a>
+                <div class="absolute hidden right-0 mt-2 w-48 bg-white rounded-md shadow-lg z-10">
+                  <div class="py-1">
+                    <a phx-click="deploy_object" phx-value-environment="development" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer">
+                      Development
+                    </a>
+                    <a phx-click="deploy_object" phx-value-environment="staging" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer">
+                      Staging
+                    </a>
+                    <a phx-click="deploy_object" phx-value-environment="production" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer">
+                      Production
+                    </a>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
           
-          <div class="p-6">
-            <div class="mb-6">
-              <div class="text-sm text-gray-600 mb-1">Description</div>
-              <p><%= @selected_object.description || "No description provided" %></p>
+          <div class="bg-white shadow-md rounded-lg p-4 mb-4">
+            <div class="flex justify-between items-center mb-2">
+              <h3 class="text-lg font-semibold">Code Content</h3>
+              <button phx-click="execute_object" phx-value-id={@selected_object.id} class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded">
+                Execute Code
+              </button>
             </div>
+            <pre class="bg-gray-100 p-4 rounded overflow-auto"><code><%= @selected_object.code_content %></code></pre>
             
-            <div class="mb-6">
-              <div class="text-sm text-gray-600 mb-1">Status</div>
-              <span class={"inline-block rounded-full px-2 py-1 text-xs #{status_class(@selected_object.status)}"}>
-                <%= @selected_object.status %>
-              </span>
-            </div>
-            
-            <div class="mb-6">
-              <div class="text-sm text-gray-600 mb-1">Version</div>
-              <p><%= @selected_object.version %></p>
-              
-              <%= if length(@selected_object.modification_history) > 0 do %>
-                <div class="mt-2">
-                  <div class="text-sm text-gray-600">Previous Versions</div>
-                  <div class="mt-1 flex flex-wrap gap-2">
-                    <%= for history <- @selected_object.modification_history do %>
-                      <button 
-                        phx-click="rollback_object" 
-                        phx-value-version={Map.get(history, :previous_version, @selected_object.version - 1)} 
-                        class="px-2 py-1 text-xs bg-gray-200 hover:bg-gray-300 rounded"
-                      >
-                        Rollback to v<%= Map.get(history, :previous_version, @selected_object.version - 1) %>
-                      </button>
-                    <% end %>
-                  </div>
-                </div>
-              <% end %>
-            </div>
-            
-            <div class="mb-6">
-              <div class="text-sm text-gray-600 mb-1">Code Content</div>
-              <div class="bg-gray-100 p-4 rounded font-mono whitespace-pre-wrap overflow-x-auto">
-                <%= @selected_object.code_content %>
-              </div>
-            </div>
-            
-            <%= if @selected_object.api_schema && @selected_object.api_schema != "" do %>
-              <div class="mb-6">
-                <div class="text-sm text-gray-600 mb-1">API Schema</div>
-                <div class="bg-gray-100 p-4 rounded font-mono whitespace-pre-wrap overflow-x-auto">
-                  <%= @selected_object.api_schema %>
-                </div>
+            <%= if @execution_result do %>
+              <div class="mt-4">
+                <h4 class="font-semibold">Execution Result:</h4>
+                <pre class="bg-gray-100 p-4 rounded overflow-auto"><code><%= @execution_result %></code></pre>
               </div>
             <% end %>
           </div>
-        </div>
-      <% else %>
-        <div class="bg-white shadow-md rounded-lg p-8 text-center">
-          <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-          </svg>
-          <h3 class="mt-2 text-lg font-medium text-gray-900">No object selected</h3>
-          <p class="mt-1 text-gray-500">Select an object from the list or create a new one</p>
-        </div>
-      <% end %>
+          
+          <div class="bg-white shadow-md rounded-lg p-4 mb-4">
+            <h3 class="text-lg font-semibold mb-2">API Schema</h3>
+            <pre class="bg-gray-100 p-4 rounded overflow-auto"><code><%= @selected_object.api_schema || "No API schema defined" %></code></pre>
+          </div>
+          
+          <div class="bg-white shadow-md rounded-lg p-4 mb-4">
+            <h3 class="text-lg font-semibold mb-2">File Paths</h3>
+            <pre class="bg-gray-100 p-4 rounded overflow-auto"><code><%= @selected_object.file_paths || "No file paths defined" %></code></pre>
+          </div>
+        <% else %>
+          <div class="flex flex-col items-center justify-center h-full">
+            <p class="text-gray-500 text-xl">No object selected</p>
+            <p class="text-gray-400">Select an object from the list or create a new one</p>
+          </div>
+        <% end %>
+      </div>
     </div>
   </div>
 </div>

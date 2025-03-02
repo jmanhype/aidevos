@@ -65,7 +65,7 @@ IO.puts("\n=== Testing the Constraint Checking Phase ===")
       3. The function should handle numeric inputs only
       
       Code modification:
-      #{modification.code}
+      #{modification.modified_code}
       """
     }
   ]
@@ -90,7 +90,7 @@ IO.puts("\n=== Testing the Factuality Checking Phase ===")
       3. Returns the result of the operation
       
       Code modification:
-      #{modification.code}
+      #{modification.modified_code}
       """
     }
   ]
@@ -115,7 +115,7 @@ IO.puts("\n=== Testing the Preference Evaluation Phase ===")
       3. Simplicity
       
       Code modification:
-      #{modification.code}
+      #{modification.modified_code}
       """
     }
   ]

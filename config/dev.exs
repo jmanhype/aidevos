@@ -73,3 +73,9 @@ config :realworld, Realworld.Repo,
   port: 5432,
   show_sensitive_data_on_connection_error: true,
   pool_size: 10
+
+# Configure Bamboo mailer for development to use SendGrid
+config :realworld, Realworld.Mailer,
+  adapter: Bamboo.SendGridAdapter,
+  api_key: System.get_env("SENDGRID_API_KEY"),
+  from_email: System.get_env("FROM_EMAIL") || "noreply@example.com"

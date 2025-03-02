@@ -78,4 +78,10 @@ if config_env() == :prod do
     url: database_url,
     pool_size: String.to_integer(System.get_env("POOL_SIZE") || "10"),
     socket_options: [:inet6]
+
+  # Configure Bamboo mailer for production runtime
+  config :realworld, Realworld.Mailer,
+    adapter: Bamboo.SendGridAdapter,
+    api_key: System.get_env("SENDGRID_API_KEY"),
+    from_email: System.get_env("FROM_EMAIL") || "noreply@example.com"
 end

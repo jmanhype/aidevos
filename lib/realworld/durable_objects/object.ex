@@ -2,7 +2,7 @@ defmodule Realworld.DurableObjects.Object do
   use Ash.Resource,
     domain: Realworld.DurableObjects.Registry,
     data_layer: AshPostgres.DataLayer
-
+  
   postgres do
     table "durable_objects"
     repo Realworld.Repo
@@ -30,13 +30,35 @@ defmodule Realworld.DurableObjects.Object do
     attribute :status, :string, default: "draft"
     attribute :last_modified, :utc_datetime, default: &DateTime.utc_now/0
     
+    # File system related attributes
+    attribute :file_paths, {:array, :string}, default: []
+    attribute :creation_plan, :string, default: ""
+    attribute :file_structure, :map, default: %{}, allow_nil?: true
+    attribute :dependencies, :map, default: %{}, allow_nil?: true
+    
     attribute :modification_history, {:array, :map}, default: []
     attribute :deployment_history, {:array, :map}, default: []
     attribute :rollback_history, {:array, :map}, default: []
   end
 
   actions do
-    defaults [:create, :read, :update, :destroy]
+    defaults [:read, :update, :destroy]
+    
+    create :create do
+      primary? true
+      accept [:name, :description, :code_content, :api_schema, :version, :status, 
+              :file_paths, :creation_plan, :file_structure, :dependencies,
+              :modification_history, :deployment_history, :rollback_history]
+              
+      # Set default values for required fields
+      change fn changeset, _args ->
+        if Ash.Changeset.get_attribute(changeset, :code_content) == nil do
+          Ash.Changeset.change_attribute(changeset, :code_content, "")
+        else
+          changeset
+        end
+      end
+    end
     
     # Modified by AI action
     update :modify do

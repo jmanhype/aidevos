@@ -1,111 +1,80 @@
-# Self-Modifying Durable Objects with Agentic Reward Modeling
+# ![RealWorld Example App](logo.png)
 
-This extension to the RealWorld application demonstrates a system for safely self-modifying code using Ash Framework resources and OpenAI-based reward modeling.
+> ### Ash + Phoenix LiveView codebase containing real world examples (CRUD, auth, advanced patterns, etc) that adheres to the [RealWorld](https://github.com/gothinkster/realworld) spec and API.
 
-## Key Concepts
 
-### 1. Durable Objects
+### [Demo](https://realworld-ash.fly.dev/)&nbsp;&nbsp;&nbsp;&nbsp;[RealWorld](https://github.com/gothinkster/realworld)
 
-Durable Objects are persistent, versioned pieces of code that can be modified, deployed, and rolled back. Each object is represented as an Ash Resource with:
 
-- Identifier and metadata
-- Code content and optional API schema
-- Version history and modification records
-- Status tracking (draft, deployed, failed, deprecated)
+This codebase was created to demonstrate a fully fledged fullstack application built with **Ash** + **Phoenix LiveView** including CRUD operations, authentication, routing, pagination, and more.
 
-### 2. Agentic Reward Modeling (ARM)
+We've gone to great lengths to adhere to the **Ash** + **Phoenix LiveView** community styleguides & best practices.
 
-The Self-Modifying Objects system incorporates ARM to ensure that code modifications align with human preferences and maintain correctness:
+For more information on how to this works with other frontends/backends, head over to the [RealWorld](https://github.com/gothinkster/realworld) repo.
 
-- **Human Preference Evaluation**: Measures readability, maintainability, elegance, documentation quality
-- **Constraint Checking**: Ensures modifications adhere to constraints in the original code and API schema
-- **Factuality Verification**: Validates the correctness of implemented algorithms and domain-specific knowledge
 
-### 3. Safety Mechanisms
+# How it works
 
-Multiple layers of safety are built into the system:
+> A fullstack phoenix liveview application with backend built with [Ash Framework](https://ash-hq.org/).
 
-- **Validation Chain**: Every modification passes through planning, generation, and multi-dimensional evaluation
-- **Threshold-Based Acceptance**: Modifications are only accepted if they meet configurable quality thresholds
-- **Version Control**: Complete history with rollback capabilities
-- **Memory-Aware Mutations**: System records all modifications and evaluations for transparency and auditing
+### Prerequisites
 
-## Implementation Details
+* erlang 25.2 and elixir 1.14.2-otp-25
+* PostgreSQL 14.6
 
-### Core Components
+### Installation
 
-1. **Object Resource**: Defines the Durable Object structure and relationships
-2. **Instructor Models**: Structured inputs and outputs using instructor_ex
-3. **Reward Evaluator**: Components that analyze code modifications across different dimensions
-4. **Code Modification Pipeline**: Orchestrates the planning, generation, and evaluation steps
-5. **Deployment System**: Safely loads and tests modified code
-6. **LiveView Interface**: User interface for managing objects and modifications
-
-### Key Files
-
-- `lib/realworld/durable_objects/object.ex`: Core resource definition
-- `lib/realworld/durable_objects/models/*.ex`: Structured data models
-- `lib/realworld/durable_objects/reward_modeling/*.ex`: Evaluation components
-- `lib/realworld/durable_objects/changes/*.ex`: Code mutation and deployment logic
-- `lib/realworld_web/live/durable_object_live.ex`: Phoenix LiveView interface
-
-## Getting Started
-
-### Setup
-
-1. Make sure dependencies are installed:
-   ```bash
+1. Clone the repo
+   ```
+   git clone https://github.com/team-alembic/realworld.git
+   ```
+2. Install dependencies
+   ```
+   cd realworld
    mix deps.get
    ```
-
-2. Create and migrate the database:
-   ```bash
-   mix ecto.setup
+3. Create a postgres database and run migration with ash_postgres
+   ```
+   mix ash.setup && mix ash.migrate
    ```
 
-3. Start the Phoenix server:
-   ```bash
-   mix phx.server
+### Test
+1. Create a test database and run migration with ash_postgres
+   ```
+   MIX_ENV=test mix ash_postgres.create && MIX_ENV=test mix ash.migrate
    ```
 
-4. Visit [`localhost:4000/durable-objects`](http://localhost:4000/durable-objects) to manage your Durable Objects
+2. Run the tests
+   ```
+   mix test
+   ```
 
-### Configuration
+# Getting started
 
-Configure OpenAI API keys in your environment:
+To start your Phoenix server:
 
-```bash
-export OPENAI_API_KEY=your_api_key_here
-```
+  * Start Phoenix endpoint with `mix phx.server` or inside IEx with `iex -S mix phx.server`
 
-### Creating a Self-Modifying Object
+Now you can visit [`localhost:4000`](http://localhost:4000) from your browser.
 
-1. Use the web interface to create a new Durable Object with initial code
-2. Provide a modification prompt describing the desired changes
-3. The system will plan, generate, and evaluate the modifications
-4. If the changes meet quality thresholds, the object will be updated
-5. Deploy the object to make it active in the system
+# Durable Objects
 
-## Use Cases
+This application includes a system for creating and managing Durable Objects - self-contained modules that can be created, modified, and deployed through the UI or via voice commands.
 
-- **Self-extending APIs**: APIs that can evolve based on usage patterns
-- **Adaptive Data Models**: Resources that adjust their structure based on data trends
-- **Learning System Components**: System parts that improve through feedback loops
-- **AI-assisted Refactoring**: Code that gets continuously improved with minimal human intervention
+## Key Features
 
-## Future Enhancements
+- Create objects manually or using AI
+- Modify existing objects with natural language prompts
+- Deploy objects to different environments
+- Voice command integration via Twilio
 
-- **Local Model Support**: Integration with local LLMs for offline operation
-- **Learning from Rejections**: System improvement based on failed modifications
-- **Multi-Agent Review**: Multiple specialized evaluation agents for different aspects
-- **User Feedback Loop**: Incorporating explicit user feedback into the reward model
+## Documentation
 
-## Security Considerations
+For detailed information about the system's features, please refer to:
 
-This system allows code to modify itself, which inherently carries risks. Always:
+- [Object Lifecycle Documentation](README.object_lifecycle.md) - How objects are created, activated, and managed
+- [Voice Integration Documentation](README.voice_integration.md) - How to use voice commands with the system
+- [SMS Integration Documentation](README.sms_integration.md) - How to use SMS commands with the system
 
-1. Run in a sandboxed environment
-2. Limit the scope of what self-modifying objects can access
-3. Monitor for unusual behavior
-4. Maintain multiple backups and rollback capabilities
-5. Consider a human-in-the-loop approach for critical systems
+# Sending a Pull Request
+The consultants at Alembic are monitoring for pull requests when they are “on the beach” (aka when they are not billable or working with a client). We will review your pull request and either merge it, request changes to it, or close it with an explanation. For changes raised when there are no consultants on the beach, please expect some delay. We will do our best to provide update and feedback throughout the process.

@@ -7,6 +7,10 @@ defmodule Realworld.Application do
 
   @impl true
   def start(_type, _args) do
+    # Configure ExTwilio
+    Application.put_env(:ex_twilio, :account_sid, System.get_env("TWILIO_ACCOUNT_SID"))
+    Application.put_env(:ex_twilio, :auth_token, System.get_env("TWILIO_AUTH_TOKEN"))
+    
     children = [
       # Start the Telemetry supervisor
       RealworldWeb.Telemetry,
@@ -19,7 +23,9 @@ defmodule Realworld.Application do
       Realworld.Repo,
       {AshAuthentication.Supervisor, otp_app: :realworld},
       # Start the Instructor configuration process
-      Realworld.InstructorConfig
+      Realworld.InstructorConfig,
+      # Start the VoiceCallsETS GenServer
+      Realworld.VoiceCallsETS
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html

@@ -60,7 +60,16 @@ defmodule Realworld.MixProject do
       # New dependencies for self-modifying objects with reward modeling
       {:instructor, github: "thmsmlr/instructor_ex", branch: "main"},
       {:ex_openai, "~> 1.0", as: :openai},
-      {:req, "~> 0.4"}
+      {:req, "~> 0.4"},
+      {:uuid, "~> 1.1"},
+      {:httpoison, "~> 2.0"},
+      
+      # Integration test dependencies
+      {:ex_twilio, "~> 0.8.1"},
+      {:bamboo, "~> 2.3.0", override: true},
+      {:bamboo_smtp, "~> 4.2.0"},
+      {:mime, "~> 2.0", override: true},
+      {:meck, "~> 0.9.2", only: :test}
     ]
   end
 
@@ -73,7 +82,8 @@ defmodule Realworld.MixProject do
   defp aliases do
     [
       setup: ["deps.get"],
-      "assets.deploy": ["esbuild default --minify", "phx.digest"]
+      "assets.deploy": ["esbuild default --minify", "phx.digest"],
+      test: ["ecto.create --quiet", "ecto.migrate --quiet", "test"]
     ]
   end
 end
