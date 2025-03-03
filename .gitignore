@@ -36,3 +36,33 @@ npm-debug.log
 .env
 .env.*
 !.env.example
+<<<<<<< HEAD
+=======
+
+# Test files containing API keys
+test_multi_agent_development.exs
+debug_huggingface_api.exs
+debug_proxy_lite_connection.exs
+test_huggingface_connection.exs
+
+# Script folders that might contain sensitive information
+/scripts/test_callback.exs
+/scripts/test_vsm_callback.exs
+/scripts/update_twilio_config.exs
+>>>>>>> 466e18a (Security: Update configuration files to use environment variables instead of hardcoded secrets and improve .gitignore to exclude sensitive files)
+
+# Environment files containing sensitive information
+.env
+.env.*
+!.env.example
+
+# Test files containing API keys
+test_multi_agent_development.exs
+debug_huggingface_api.exs
+debug_proxy_lite_connection.exs
+test_huggingface_connection.exs
+
+# Script folders that might contain sensitive information
+/scripts/test_callback.exs
+/scripts/test_vsm_callback.exs
+/scripts/update_twilio_config.exs

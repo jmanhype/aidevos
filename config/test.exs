@@ -4,7 +4,7 @@ import Config
 # you can enable the server option below.
 config :realworld, RealworldWeb.Endpoint,
   http: [ip: {127, 0, 0, 1}, port: 4002],
-  secret_key_base: "jAJcw6eSIxJXZkGZFsHQDmRlA/Yw9+NkXwpKm/9Oc/Ub8FnXRFEDVPuqgSUGBBcL",
+  secret_key_base: System.get_env("TEST_SECRET_KEY_BASE") || "TEST_SECRET_KEY_BASE_REPLACE_FOR_PRODUCTION",
   server: false
 
 # In test we don't send emails.

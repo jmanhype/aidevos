@@ -13,7 +13,7 @@ config :realworld, RealworldWeb.Endpoint,
   check_origin: false,
   code_reloader: true,
   debug_errors: true,
-  secret_key_base: "vLaMQOgFn6y3Fr0S+4DEbYE/ywdnwaQquyrswB+2peW/yNZkdu7bQ2aIvnA5nXW+",
+  secret_key_base: System.get_env("DEV_SECRET_KEY_BASE") || "DEV_SECRET_KEY_BASE_REPLACE_FOR_PRODUCTION",
   watchers: [
     # Start the esbuild watcher by calling Esbuild.install_and_run(:default, args)
     esbuild: {Esbuild, :install_and_run, [:default, ~w(--sourcemap=inline --watch)]}

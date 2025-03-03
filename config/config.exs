@@ -76,7 +76,7 @@ config :realworld, :ash_domains, [Realworld.Accounts, Realworld.Articles, Realwo
 config :realworld, ecto_repos: [Realworld.Repo]
 
 config :realworld,
-  token_signing_secret: "WJ/qX8VMGRT192yLhUvJrRM32W1iycdvKVzOVfk6pJSDqF2rRRyhluZW1NRUyo83"
+  token_signing_secret: System.get_env("TOKEN_SIGNING_SECRET") || "REPLACE_IN_PRODUCTION_WITH_SECURE_SECRET"
 
 config :realworld, :twilio,
   account_sid: System.get_env("TWILIO_ACCOUNT_SID"),
